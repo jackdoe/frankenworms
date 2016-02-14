@@ -12,6 +12,26 @@ $ curl http://localhost:8080/ | dot -x -Tpng > out.png
 
 ![screenshot](https://raw.githubusercontent.com/jackdoe/worm/master/out.png)
 
+when you start it it spins up and starts doing things forever, due to the nature of the connections
+
+```
+2016/02/14 16:58:33 AVER activated, nReceived: 110
+2016/02/14 16:58:33 DA3 activated, nReceived: 28
+2016/02/14 16:58:33 DD5 activated, nReceived: 47
+2016/02/14 16:58:33 AIML activated, nReceived: 6
+2016/02/14 16:58:33 AS10 activated, nReceived: 6
+2016/02/14 16:58:33 AVJL activated, nReceived: 33
+2016/02/14 16:58:33 SIADL activated, nReceived: 5
+2016/02/14 16:58:33 URAVL activated, nReceived: 5
+2016/02/14 16:58:33 PVNL activated, nReceived: 12
+2016/02/14 16:58:33 VD4 activated, nReceived: 57
+2016/02/14 16:58:33 ADLL activated, nReceived: 2
+2016/02/14 16:58:33 SIADR activated, nReceived: 3
+...
+```
+
+use `$ curl http://localhost:8080/debug` to toggle debug print
+
 ### warning: this is not the correct way to do this, but I have to start somewhere :)
 
 ## links 
