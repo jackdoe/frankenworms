@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/csv"
+	"flag"
 	"fmt"
 	gv "github.com/awalterschulze/gographviz"
 	parser "github.com/awalterschulze/gographviz/parser"
@@ -10,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 )
 
 var ID_TO_NEURON = map[string]*neuron{}
@@ -37,6 +39,9 @@ func rcsv(name string, cb func([]string)) {
 }
 
 func main() {
+	pDoGame := flag.Bool("game", false, "start the game")
+	flag.Parse()
+
 	rcsv("data/neurons.csv", func(records []string) {
 		newEmptyNeuron(records[0], records, 5, BODY)
 	})
@@ -66,7 +71,6 @@ func main() {
 	for _, v := range ID_TO_NEURON {
 		v.ticker()
 	}
-	BODY.ticker()
 
 	http.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
 		q := r.URL.RawQuery
@@ -101,5 +105,16 @@ func main() {
 		output := graph.String()
 		fmt.Fprintf(w, output)
 	})
-	log.Fatal(http.ListenAndServe(":8080", nil))
+
+	go func() {
+		log.Fatal(http.ListenAndServe(":8080", nil))
+	}()
+	if *pDoGame {
+		world()
+	} else {
+		BODY.ticker()
+		for {
+			time.Sleep(1 * time.Second)
+		}
+	}
 }

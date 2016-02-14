@@ -44,18 +44,17 @@ func (b *body) ticker() {
 	go func() {
 		for {
 			delta := b.left.delta()
-			if delta > 0 {
+			if delta != 0 {
 				log.Printf("move left: %d", delta)
 			}
 			delta = b.right.delta()
-			if delta > 0 {
+			if delta != 0 {
 				log.Printf("move right: %d", delta)
 			}
 			time.Sleep(200 * time.Millisecond)
 		}
 	}()
 }
-
 func newBody() *body {
 	return &body{
 		left:  &muscle{name: "left"},

@@ -4,6 +4,12 @@ In attempts to understand c-elegans robot better, I wanted to get more hands-on 
 
 Data comes from from https://github.com/openworm/data-viz/tree/master/HivePlots
 
+![screenshot](https://raw.githubusercontent.com/jackdoe/worm/master/out.gif)
+
+the object moves without any programming about how it should move, it just has hooks to muscle neurons as if it has left/right wheels, but the network lights up on its own
+
+### start it
+
 ```
 $ go run *.go
 $ curl http://localhost:8080/ping?ASGR # give it food, and watch it go
@@ -14,21 +20,16 @@ $ curl http://localhost:8080/ | dot -x -Tsvg > out.svg # will take a while
 
 when you start it it spins up and starts doing things forever, due to the nature of the connections
 
-
 ```
-2016/02/14 21:19:53 move right: 30
-2016/02/14 21:19:53 move left: 4
-2016/02/14 21:19:54 move left: 51
-2016/02/14 21:19:54 move right: 42
-2016/02/14 21:19:54 move right: 4
-2016/02/14 21:19:54 move left: 52
-2016/02/14 21:19:54 move right: 49
-2016/02/14 21:19:55 move right: 21
-2016/02/14 21:19:55 move left: 48
-2016/02/14 21:19:55 move right: 31
-2016/02/14 21:19:55 move left: 42
-2016/02/14 21:19:55 move right: 22
-2016/02/14 21:19:56 move left: 95
+2016/02/14 23:12:05 move left: -4
+2016/02/14 23:12:05 move right: -24
+2016/02/14 23:12:05 move left: -15
+2016/02/14 23:12:05 move right: -1
+2016/02/14 23:12:06 move left: -16
+2016/02/14 23:12:06 move right: 3
+2016/02/14 23:12:06 move left: 31
+2016/02/14 23:12:06 move right: -13
+2016/02/14 23:12:06 move left: -12
 ```
 
 use `$ curl http://localhost:8080/debug` to toggle debug print
@@ -47,6 +48,10 @@ use `$ curl http://localhost:8080/debug` to toggle debug print
 2016/02/14 21:20:21 VB8 activated, nReceived: 28
 2016/02/14 21:20:21 AVAR activated, nReceived: 233
 ```
+
+### world
+
+for now just spawn the c.elegans as a player in simple terminal 2d world, started by `go run *.go -game` and then show it food with `curl http://localhost:8080/ping?ASGR`
 
 ### muscle
 
