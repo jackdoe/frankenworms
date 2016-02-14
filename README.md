@@ -22,3 +22,4 @@ $ curl http://localhost:8080/ | dot -x -Tpng > out.png
 * [OpenWorm.org](http://www.openworm.org/)
 * [GENERAL NATURE OF THE GENETIC CODE FOR PROTEINS](https://profiles.nlm.nih.gov/ps/access/SCBCBJ.pdf)
 * [C. Elegans Hermaphrodite sensory receptors](http://wormatlas.org/hermaphrodite/nervous/Images/neurotable1leg.htm)
+* [wormbook mechanosensation](http://www.wormbook.org/chapters/www_mechanosensation/mechanosensation.html)
