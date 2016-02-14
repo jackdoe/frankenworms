@@ -6,7 +6,7 @@ Data comes from from https://github.com/openworm/data-viz/tree/master/HivePlots
 
 ![screenshot](https://raw.githubusercontent.com/jackdoe/worm/master/out.gif)
 
-the object moves without any programming about how it should move, it just has hooks to muscle neurons as if it has left/right wheels, but the network lights up on its own
+the object moves without any programming about how it should move, it just has hooks to muscle neurons as if it owns left/right wheels, but the network lights up on its own
 
 ### start it
 
