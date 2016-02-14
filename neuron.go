@@ -28,6 +28,7 @@ type neuron struct {
 	threshold   uint32
 	nActive     uint32
 	nReceived   uint32
+	wakeup      chan bool
 }
 
 func (n *neuron) connect(to receiver, weight uint32) {
@@ -47,6 +48,10 @@ func (n *neuron) id() string {
 
 func (n *neuron) ping(weight uint32) {
 	n.nReceived += weight
+	// select {
+	// case n.wakeup <- true:
+	// default:
+	// }
 }
 
 func (n *neuron) ticker() {
@@ -64,8 +69,12 @@ func (n *neuron) ticker() {
 				}
 			}
 			n.nReceived = 0
+
 			sleep := 50 + rand.Int31n(50)
-			time.Sleep(time.Millisecond * time.Duration(sleep))
+			select {
+			case <-n.wakeup:
+			case <-time.After(time.Millisecond * time.Duration(sleep)):
+			}
 		}
 	}()
 }
@@ -75,6 +84,7 @@ func newEmptyNeuron(id string, meta []string, threshold uint32) *neuron {
 		connections: []*connection{},
 		threshold:   threshold,
 		meta:        meta,
+		wakeup:      make(chan bool),
 	}
 	ID_TO_NEURON[id] = n
 	return n
