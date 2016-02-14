@@ -13,7 +13,8 @@ import (
 )
 
 var ID_TO_NEURON = map[string]*neuron{}
-var DEBUG = true
+var BODY = newBody()
+var DEBUG = false
 
 func rcsv(name string, cb func([]string)) {
 	f, err := os.Open(name)
@@ -37,28 +38,40 @@ func rcsv(name string, cb func([]string)) {
 
 func main() {
 	rcsv("data/neurons.csv", func(records []string) {
-		newEmptyNeuron(records[0], records, 1)
+		newEmptyNeuron(records[0], records, 5, BODY)
 	})
 
 	rcsv("data/connectome.csv", func(records []string) {
-		if records[2] == "Send" {
-			weight, err := strconv.ParseUint(records[3], 10, 32)
-			if err != nil {
-				log.Fatal(err)
-			}
+		weight, err := strconv.ParseInt(records[3], 10, 32)
+		if err != nil {
+			log.Fatal(err)
+		}
 
-			ID_TO_NEURON[records[0]].connect(ID_TO_NEURON[records[1]], uint32(weight))
+		ID_TO_NEURON[records[0]].connect(ID_TO_NEURON[records[1]], int32(weight))
+	})
+
+	rcsv("data/fake_motor.csv", func(records []string) {
+		weight, err := strconv.ParseInt(records[3], 10, 32)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if records[1] == "LEFT" {
+			ID_TO_NEURON[records[0]].connect(BODY.left, int32(weight))
+		} else if records[1] == "RIGHT" {
+			ID_TO_NEURON[records[0]].connect(BODY.right, int32(weight))
 		}
 	})
 
 	for _, v := range ID_TO_NEURON {
 		v.ticker()
 	}
+	BODY.ticker()
 
 	http.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
 		q := r.URL.RawQuery
 		if n, ok := ID_TO_NEURON[r.URL.RawQuery]; ok {
-			n.ping(2)
+			n.ping(30)
 			fmt.Fprintf(w, "nReceived: %d", n.nReceived)
 		} else {
 			http.Error(w, fmt.Sprintf("missing neuron: %s", q), 404)
@@ -73,9 +86,9 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		graphAst, _ := parser.ParseString(`digraph G {}`)
 		graph := gv.NewGraph()
-		gv.Analyse(graphAst, graph)
-
+		graph.SetDir(true)
 		for _, v := range ID_TO_NEURON {
+
 			if v.activity() > 0 {
 				graph.AddNode("G", v.id(), nil)
 				for _, c := range v.connections {
@@ -84,7 +97,7 @@ func main() {
 				}
 			}
 		}
-
+		gv.Analyse(graphAst, graph)
 		output := graph.String()
 		fmt.Fprintf(w, output)
 	})
