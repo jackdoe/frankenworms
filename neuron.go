@@ -1,20 +1,40 @@
 package main
 
-import "log"
+import (
+	"log"
+	"math/rand"
+	"time"
+)
 
 type receiver interface {
-	ping(receiver)
-	tick()
+	ping(weight uint32)
 	id() string
 	activity() uint32
+	connect(receiver, uint32)
+}
+
+type connection struct {
+	to     receiver
+	weight uint32
+}
+
+func (c connection) ping() {
+	c.to.ping(c.weight)
 }
 
 type neuron struct {
-	peers     []receiver
-	meta      []string
-	threshold uint32
-	nActive   uint32
-	nReceived uint32
+	connections []*connection
+	meta        []string
+	threshold   uint32
+	nActive     uint32
+	nReceived   uint32
+}
+
+func (n *neuron) connect(to receiver, weight uint32) {
+	n.connections = append(n.connections, &connection{
+		to:     to,
+		weight: weight,
+	})
 }
 
 func (n *neuron) activity() uint32 {
@@ -25,35 +45,36 @@ func (n *neuron) id() string {
 	return n.meta[0]
 }
 
-func (n *neuron) ping(from receiver) {
-	n.nReceived++
-	if from == nil {
-		log.Printf("%s: pinged from external entity, nReceived: %d", n.id(), n.nReceived)
-	} else {
-		log.Printf("%s: pinged from %s, nReceived: %d", n.id(), from.id(), n.nReceived)
-	}
+func (n *neuron) ping(weight uint32) {
+	n.nReceived += weight
 }
 
-func (n *neuron) tick() {
-	if n.nReceived > n.threshold {
-		n.nActive++
-		for _, peer := range n.peers {
-			peer.ping(n)
+func (n *neuron) ticker() {
+	go func() {
+		rand.Seed(time.Now().Unix())
+		for {
+			if n.nReceived > n.threshold {
+				if DEBUG {
+					log.Printf("%s activated, nReceived: %d", n.id(), n.nReceived)
+				}
+
+				n.nActive++
+				for _, conn := range n.connections {
+					conn.ping()
+				}
+			}
+			n.nReceived = 0
+			sleep := 50 + rand.Int31n(50)
+			time.Sleep(time.Millisecond * time.Duration(sleep))
 		}
-	}
-	n.nReceived = 0
-}
-
-func connect(id string, peer string) {
-	n := ID_TO_NEURON[id]
-	n.peers = append(n.peers, ID_TO_NEURON[peer])
+	}()
 }
 
 func newEmptyNeuron(id string, meta []string, threshold uint32) *neuron {
 	n := &neuron{
-		peers:     []receiver{},
-		threshold: threshold,
-		meta:      meta,
+		connections: []*connection{},
+		threshold:   threshold,
+		meta:        meta,
 	}
 	ID_TO_NEURON[id] = n
 	return n
